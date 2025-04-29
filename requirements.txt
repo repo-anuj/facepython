@@ -1,0 +1,7 @@
+Flask>=2.0.1
+opencv-python>=4.5.0
+numpy>=1.21.0
+tensorflow-cpu>=2.8.0
+scikit-learn>=1.0.0
+mediapipe>=0.8.9
+pillow>=8.0.0

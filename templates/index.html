@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FacePython - Advanced Face Detection</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>FacePython</h1>
+            <p>Advanced Face Detection</p>
+        </header>
+
+        <main>
+            <div class="video-container">
+                <img src="{{ url_for('video_feed') }}" alt="Video Feed">
+            </div>
+
+            <div class="controls">
+                <div class="control-group">
+                    <h3>Capture</h3>
+                    <button id="capture-btn" class="btn">
+                        <i class="fas fa-camera"></i> Take Screenshot
+                    </button>
+                </div>
+
+                <div class="control-group">
+                    <h3>Filters</h3>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-filter="0">None</button>
+                        <button class="filter-btn" data-filter="1">Filter 1</button>
+                        <button class="filter-btn" data-filter="2">Filter 2</button>
+                        <button class="filter-btn" data-filter="3">Filter 3</button>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>Features</h3>
+                    <div class="feature-toggles">
+                        <button id="emotion-toggle" class="toggle-btn">
+                            <i class="fas fa-smile"></i> Emotion Detection
+                        </button>
+                        <button id="age-gender-toggle" class="toggle-btn">
+                            <i class="fas fa-user"></i> Age/Gender
+                        </button>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>ML Controls</h3>
+                    <div class="feature-toggles">
+                        <button id="ml-mode-toggle" class="toggle-btn active">
+                            <i class="fas fa-brain"></i> ML Detection
+                        </button>
+                        <button id="landmarks-toggle" class="toggle-btn">
+                            <i class="fas fa-map-marker-alt"></i> Face Landmarks
+                        </button>
+                        <button id="face-recognition-toggle" class="toggle-btn">
+                            <i class="fas fa-id-card"></i> Face Recognition
+                        </button>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>Data Collection</h3>
+                    <div class="feature-toggles">
+                        <button id="data-collection-toggle" class="toggle-btn">
+                            <i class="fas fa-database"></i> Collection Mode
+                        </button>
+                    </div>
+                    <div class="collection-form" id="collection-form" style="display: none; margin-top: 10px;">
+                        <input type="text" id="person-name" placeholder="Person name" class="form-input">
+                        <input type="number" id="max-images" placeholder="Max images (default: 50)" class="form-input" min="10" max="200">
+                        <button id="start-collection-btn" class="btn btn-sm">
+                            <i class="fas fa-play"></i> Start Collection
+                        </button>
+                        <button id="stop-collection-btn" class="btn btn-sm" disabled>
+                            <i class="fas fa-stop"></i> Stop Collection
+                        </button>
+                    </div>
+                    <div id="collection-status" class="status-box" style="display: none; margin-top: 10px;">
+                        <div class="progress-bar">
+                            <div class="progress" id="collection-progress" style="width: 0%;"></div>
+                        </div>
+                        <p id="collection-status-text">Not collecting</p>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>Face Recognition Training</h3>
+                    <div class="training-controls">
+                        <button id="train-model-btn" class="btn">
+                            <i class="fas fa-cogs"></i> Train Face Recognition
+                        </button>
+                        <div class="training-options" style="margin-top: 10px;">
+                            <input type="number" id="epochs" placeholder="Epochs (default: 20)" class="form-input" min="5" max="100">
+                            <input type="number" id="batch-size" placeholder="Batch size (default: 32)" class="form-input" min="8" max="64">
+                        </div>
+                    </div>
+                    <div id="training-status" class="status-box" style="display: none; margin-top: 10px;">
+                        <div class="progress-bar">
+                            <div class="progress" id="training-progress" style="width: 0%;"></div>
+                        </div>
+                        <p id="training-status-text">Not training</p>
+                    </div>
+                    <div id="model-info" class="info-box" style="margin-top: 10px;">
+                        <p id="model-info-text">No model loaded</p>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>Emotion Recognition Training</h3>
+                    <div class="training-controls">
+                        <button id="train-emotion-btn" class="btn">
+                            <i class="fas fa-smile"></i> Train Emotion Model
+                        </button>
+                        <div class="training-options" style="margin-top: 10px;">
+                            <input type="number" id="emotion-epochs" placeholder="Epochs (default: 50)" class="form-input" min="10" max="200">
+                            <input type="number" id="emotion-batch-size" placeholder="Batch size (default: 32)" class="form-input" min="8" max="64">
+                        </div>
+                    </div>
+                    <div id="emotion-training-status" class="status-box" style="display: none; margin-top: 10px;">
+                        <div class="progress-bar">
+                            <div class="progress" id="emotion-training-progress" style="width: 0%;"></div>
+                        </div>
+                        <p id="emotion-training-status-text">Not training</p>
+                    </div>
+                    <div id="emotion-model-info" class="info-box" style="margin-top: 10px;">
+                        <p id="emotion-model-info-text">No emotion model loaded</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="captures" class="captures">
+                <h3>Captured Images</h3>
+                <div id="capture-gallery" class="capture-gallery"></div>
+            </div>
+
+            <div id="collected-data" class="collected-data">
+                <h3>Collected Face Data</h3>
+                <div id="collected-people" class="collected-people">
+                    <p>No face data collected yet.</p>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2023 FacePython - Advanced Face Detection</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
